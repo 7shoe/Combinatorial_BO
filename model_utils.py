@@ -536,7 +536,7 @@ class SparseBayesReg:
 # - - - - - - - - - - - - - - - - - - - - - 
 
 class SDP:
-    def __init__(self, alpha:np.array, lambd:float=0.1, pen_ord:int=2, mode:str='min', d_MAX:int=20) -> List[np.array]:
+    def __init__(self, alpha:np.array, lambd:float=10**(-4), pen_ord:int=2, mode:str='min', d_MAX:int=20) -> List[np.array]:
         
         assert isinstance(mode, str), "Input `mode` must be a either `min` or `max`."
         assert mode in ['min', 'max'], f"Input `mode` is str. In addition, it must be a str either `min` or `max` but `{mode}` was provided."
@@ -580,6 +580,12 @@ class SDP:
         bt = 0.5 * (b + A @ np.ones(self.d)).reshape((-1, 1))
         bt = bt.reshape((self.d, 1))
         At = np.vstack((np.append(0.25*A, 0.25*bt, axis=1), np.append(bt.T, 2.)))
+        
+        # penalty TEST
+        if(pen_ord==2):
+            A += self.lambd*np.eye(A.shape[0])
+        else:
+            b += self.lambd*np.ones_like(b)
         
         self.A  = A
         self.b  = b
